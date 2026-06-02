@@ -16,6 +16,74 @@
       };
     };
   });
+
+  alertRules = pkgs.writeText "maxwell-alerts.yml" ''
+    groups:
+      - name: maxwell-health
+        rules:
+          - alert: MaxwellTargetDown
+            expr: up == 0
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "{{ $labels.job }} target is down"
+              description: "{{ $labels.instance }} / {{ $labels.target }} has been unreachable for 5 minutes."
+
+          - alert: MaxwellFilesystemAlmostFull
+            expr: 100 - (node_filesystem_avail_bytes{fstype!~"tmpfs|devtmpfs|overlay|squashfs|proc|sysfs|cgroup2"} * 100 / node_filesystem_size_bytes{fstype!~"tmpfs|devtmpfs|overlay|squashfs|proc|sysfs|cgroup2"}) > 85
+            for: 15m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Filesystem {{ $labels.mountpoint }} is almost full"
+              description: "{{ $labels.mountpoint }} on {{ $labels.instance }} is above 85% used."
+
+          - alert: MaxwellFilesystemWillFillSoon
+            expr: (predict_linear(node_filesystem_avail_bytes{fstype!~"tmpfs|devtmpfs|overlay|squashfs|proc|sysfs|cgroup2",mountpoint!~"/boot|/nix/store"}[6h], 7 * 24 * 3600) < 0) and (node_filesystem_avail_bytes{fstype!~"tmpfs|devtmpfs|overlay|squashfs|proc|sysfs|cgroup2",mountpoint!~"/boot|/nix/store"} * 100 / node_filesystem_size_bytes{fstype!~"tmpfs|devtmpfs|overlay|squashfs|proc|sysfs|cgroup2",mountpoint!~"/boot|/nix/store"} < 25)
+            for: 30m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Filesystem {{ $labels.mountpoint }} may fill within 7 days"
+              description: "{{ $labels.mountpoint }} on {{ $labels.instance }} is trending toward full."
+
+          - alert: MaxwellInodesAlmostFull
+            expr: 100 - (node_filesystem_files_free{fstype!~"tmpfs|devtmpfs|overlay|squashfs|proc|sysfs|cgroup2"} * 100 / node_filesystem_files{fstype!~"tmpfs|devtmpfs|overlay|squashfs|proc|sysfs|cgroup2"}) > 85
+            for: 15m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Filesystem {{ $labels.mountpoint }} is low on inodes"
+              description: "{{ $labels.mountpoint }} on {{ $labels.instance }} is above 85% inode usage."
+
+          - alert: MaxwellSmartStatusFailed
+            expr: smartctl_device_smart_status == 0
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "SMART health failed for {{ $labels.device }}"
+              description: "{{ $labels.device }} on {{ $labels.instance }} reports failing SMART health."
+
+          - alert: MaxwellHighTemperature
+            expr: smartctl_device_temperature{temperature_type="current"} > 55
+            for: 15m
+            labels:
+              severity: warning
+            annotations:
+              summary: "{{ $labels.device }} temperature is high"
+              description: "{{ $labels.device }} on {{ $labels.instance }} is above 55C."
+
+          - alert: MaxwellSystemdUnitFailed
+            expr: node_systemd_unit_state{state="failed"} > 0
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Systemd unit failed: {{ $labels.name }}"
+              description: "{{ $labels.name }} is failed on {{ $labels.instance }}."
+  '';
 in {
   system.activationScripts.grafanaSecrets.text = ''
     install -d -m 0750 -o grafana -g grafana /var/lib/grafana
@@ -39,6 +107,7 @@ in {
     listenAddress = "0.0.0.0";
     port = 9090;
     retentionTime = "30d";
+    ruleFiles = [alertRules];
 
     exporters = {
       blackbox = {
@@ -80,6 +149,12 @@ in {
               "https://home-assistant.dcard.pt"
               "https://status.dcard.pt"
               "https://grafana.dcard.pt"
+              "https://homepage.dcard.pt"
+              "https://tools.dcard.pt"
+              "https://pdf.dcard.pt"
+              "https://mealie.dcard.pt"
+              "https://ntfy.dcard.pt"
+              "https://paste.dcard.pt"
             ];
             labels.instance = "maxwell";
           }

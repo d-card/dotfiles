@@ -10,7 +10,14 @@
     containers
     dns
     home-assistant
+    profiles.apps.homepage
+    profiles.apps."it-tools"
+    profiles.apps."stirling-pdf"
+    profiles.apps.mealie
+    profiles.apps.ntfy
+    profiles.apps.privatebin
     monitoring
+    maintenance
     acme-cloudflare
     reverse-proxy
     ssh-server
@@ -48,6 +55,42 @@
       config.age.secrets.cloudflareToken.path;
   };
   security.acme.certs."grafana.dcard.pt" = {
+    group = "nginx";
+    dnsProvider = "cloudflare";
+    credentialFiles.CLOUDFLARE_DNS_API_TOKEN_FILE =
+      config.age.secrets.cloudflareToken.path;
+  };
+  security.acme.certs."homepage.dcard.pt" = {
+    group = "nginx";
+    dnsProvider = "cloudflare";
+    credentialFiles.CLOUDFLARE_DNS_API_TOKEN_FILE =
+      config.age.secrets.cloudflareToken.path;
+  };
+  security.acme.certs."tools.dcard.pt" = {
+    group = "nginx";
+    dnsProvider = "cloudflare";
+    credentialFiles.CLOUDFLARE_DNS_API_TOKEN_FILE =
+      config.age.secrets.cloudflareToken.path;
+  };
+  security.acme.certs."pdf.dcard.pt" = {
+    group = "nginx";
+    dnsProvider = "cloudflare";
+    credentialFiles.CLOUDFLARE_DNS_API_TOKEN_FILE =
+      config.age.secrets.cloudflareToken.path;
+  };
+  security.acme.certs."mealie.dcard.pt" = {
+    group = "nginx";
+    dnsProvider = "cloudflare";
+    credentialFiles.CLOUDFLARE_DNS_API_TOKEN_FILE =
+      config.age.secrets.cloudflareToken.path;
+  };
+  security.acme.certs."ntfy.dcard.pt" = {
+    group = "nginx";
+    dnsProvider = "cloudflare";
+    credentialFiles.CLOUDFLARE_DNS_API_TOKEN_FILE =
+      config.age.secrets.cloudflareToken.path;
+  };
+  security.acme.certs."paste.dcard.pt" = {
     group = "nginx";
     dnsProvider = "cloudflare";
     credentialFiles.CLOUDFLARE_DNS_API_TOKEN_FILE =
@@ -96,6 +139,48 @@
         proxyWebsockets = true;
       };
     };
+
+    "homepage.dcard.pt" = {
+      forceSSL = true;
+      useACMEHost = "homepage.dcard.pt";
+      locations."/".proxyPass = "http://127.0.0.1:3003";
+    };
+
+    "tools.dcard.pt" = {
+      forceSSL = true;
+      useACMEHost = "tools.dcard.pt";
+      locations."/".proxyPass = "http://127.0.0.1:3004";
+    };
+
+    "pdf.dcard.pt" = {
+      forceSSL = true;
+      useACMEHost = "pdf.dcard.pt";
+      locations."/".proxyPass = "http://127.0.0.1:3005";
+    };
+
+    "mealie.dcard.pt" = {
+      forceSSL = true;
+      useACMEHost = "mealie.dcard.pt";
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:3006";
+        proxyWebsockets = true;
+      };
+    };
+
+    "ntfy.dcard.pt" = {
+      forceSSL = true;
+      useACMEHost = "ntfy.dcard.pt";
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:3007";
+        proxyWebsockets = true;
+      };
+    };
+
+    "paste.dcard.pt" = {
+      forceSSL = true;
+      useACMEHost = "paste.dcard.pt";
+      locations."/".proxyPass = "http://127.0.0.1:3008";
+    };
   };
 
   services.adguardhome.settings.filtering.rewrites = [
@@ -121,6 +206,36 @@
     }
     {
       domain = "grafana.dcard.pt";
+      answer = "192.168.1.237";
+      enabled = true;
+    }
+    {
+      domain = "homepage.dcard.pt";
+      answer = "192.168.1.237";
+      enabled = true;
+    }
+    {
+      domain = "tools.dcard.pt";
+      answer = "192.168.1.237";
+      enabled = true;
+    }
+    {
+      domain = "pdf.dcard.pt";
+      answer = "192.168.1.237";
+      enabled = true;
+    }
+    {
+      domain = "mealie.dcard.pt";
+      answer = "192.168.1.237";
+      enabled = true;
+    }
+    {
+      domain = "ntfy.dcard.pt";
+      answer = "192.168.1.237";
+      enabled = true;
+    }
+    {
+      domain = "paste.dcard.pt";
       answer = "192.168.1.237";
       enabled = true;
     }
