@@ -241,6 +241,98 @@ in {
 
   networking.firewall.interfaces.docker0.allowedTCPPorts = [9090];
 
+  services.loki = {
+    enable = true;
+    configuration = {
+      auth_enabled = false;
+
+      server = {
+        http_listen_address = "127.0.0.1";
+        http_listen_port = 3100;
+        grpc_listen_port = 9096;
+      };
+
+      common = {
+        path_prefix = "/var/lib/loki";
+        replication_factor = 1;
+        ring.kvstore.store = "inmemory";
+        storage.filesystem = {
+          chunks_directory = "/var/lib/loki/chunks";
+          rules_directory = "/var/lib/loki/rules";
+        };
+      };
+
+      schema_config.configs = [
+        {
+          from = "2026-01-01";
+          store = "tsdb";
+          object_store = "filesystem";
+          schema = "v13";
+          index = {
+            prefix = "index_";
+            period = "24h";
+          };
+        }
+      ];
+
+      limits_config = {
+        retention_period = "14d";
+        allow_structured_metadata = false;
+      };
+
+      compactor = {
+        working_directory = "/var/lib/loki/compactor";
+        retention_enabled = true;
+        delete_request_store = "filesystem";
+      };
+    };
+  };
+
+  services.alloy = {
+    enable = true;
+    extraFlags = [
+      "--disable-reporting"
+      "--server.http.listen-addr=127.0.0.1:12345"
+    ];
+  };
+
+  environment.etc."alloy/config.alloy".text = ''
+    loki.write "local" {
+      endpoint {
+        url = "http://127.0.0.1:3100/loki/api/v1/push"
+      }
+    }
+
+    loki.relabel "journal" {
+      forward_to = []
+
+      rule {
+        source_labels = ["__journal__systemd_unit"]
+        target_label  = "unit"
+      }
+
+      rule {
+        source_labels = ["__journal_priority_keyword"]
+        target_label  = "level"
+      }
+
+      rule {
+        source_labels = ["__journal_syslog_identifier"]
+        target_label  = "syslog_identifier"
+      }
+    }
+
+    loki.source.journal "system" {
+      max_age       = "12h"
+      relabel_rules = loki.relabel.journal.rules
+      labels        = {
+        job  = "systemd-journal",
+        host = "maxwell",
+      }
+      forward_to    = [loki.write.local.receiver]
+    }
+  '';
+
   services.grafana = {
     enable = true;
     settings = {
@@ -259,15 +351,31 @@ in {
 
     provision = {
       enable = true;
-      datasources.settings.datasources = [
-        {
-          name = "Prometheus";
-          type = "prometheus";
-          access = "proxy";
-          url = "http://127.0.0.1:9090";
-          isDefault = true;
-        }
-      ];
+        datasources.settings = {
+          deleteDatasources = [
+            {
+              name = "Loki";
+              orgId = 1;
+            }
+          ];
+
+          datasources = [
+            {
+              name = "Prometheus";
+              type = "prometheus";
+              access = "proxy";
+              url = "http://127.0.0.1:9090";
+              isDefault = true;
+            }
+            {
+              name = "Loki";
+              uid = "Loki";
+              type = "loki";
+              access = "proxy";
+              url = "http://127.0.0.1:3100";
+            }
+          ];
+        };
 
       dashboards.settings.providers = [
         {
@@ -284,4 +392,6 @@ in {
     ./grafana-dashboards/maxwell-storage.json;
   environment.etc."grafana-dashboards/maxwell-services.json".source =
     ./grafana-dashboards/maxwell-services.json;
+  environment.etc."grafana-dashboards/maxwell-logs.json".source =
+    ./grafana-dashboards/maxwell-logs.json;
 }
