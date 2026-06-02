@@ -1,4 +1,10 @@
-{lib, ...}: {
+{lib, ...}: let
+  authorizedKeys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMCrf5FKQmZRA9ip4s/fOt1PVg+90k6tvEoDkCnPq1qL @oppenheimer"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMOK0uyFwBEoBHuqXsrWZOAMROsDYGjzwEUmrAhz5jfr @schrodinger"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDHQiRYpOfTpddexkndt7d3Bw2wS/wLKKjs4526pJOdM @doppler"
+  ];
+in {
   services.openssh = {
     enable = true;
     ports = [22];
@@ -10,11 +16,8 @@
     };
     authorizedKeysFiles = lib.mkForce ["/etc/ssh/authorized_keys.d/%u"];
   };
-  users.users.dcard = {
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMCrf5FKQmZRA9ip4s/fOt1PVg+90k6tvEoDkCnPq1qL @oppenheimer"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMOK0uyFwBEoBHuqXsrWZOAMROsDYGjzwEUmrAhz5jfr @schrodinger"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDHQiRYpOfTpddexkndt7d3Bw2wS/wLKKjs4526pJOdM @doppler"
-    ];
+  users.users = {
+    root.openssh.authorizedKeys.keys = authorizedKeys;
+    dcard.openssh.authorizedKeys.keys = authorizedKeys;
   };
 }

@@ -4,6 +4,7 @@
   profiles,
   inputs,
   nixosConfigurations,
+  secrets,
   ...
 } @ args: let
   inherit (lib.personal) rakeLeaves;
@@ -108,7 +109,7 @@
   }:
     lib.nixosSystem {
       inherit system pkgs lib;
-      specialArgs = {inherit profiles inputs nixosConfigurations;};
+      specialArgs = {inherit profiles inputs nixosConfigurations secrets;};
       modules =
         (lib.collect builtins.isPath (lib.personal.rakeLeaves ../modules))
         ++ [

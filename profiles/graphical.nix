@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   services.xserver = {
     enable = true;
-    layout = "us";
+    xkb.layout = "us-intl";
     displayManager = {
       defaultSession = "user-xsession";
       session = [
@@ -39,15 +39,14 @@
   # Required for gtk
   services.dbus.packages = [pkgs.dconf];
 
-  fonts.fonts = with pkgs; [
+  fonts.packages = with pkgs; [
     noto-fonts
     noto-fonts-cjk
     noto-fonts-emoji
     font-awesome
-    (nerdfonts.override {fonts = ["JetBrainsMono"];})
+    nerd-fonts.jetbrains-mono
   ];
 
-  sound.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -93,4 +92,5 @@
   ];
 
   services.gnome.gnome-keyring.enable = true;
+  users.users.dcard.extraGroups = ["video"];
 }

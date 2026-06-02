@@ -40,7 +40,7 @@
       lsof
       ripgrep
       tree
-      neofetch
+      fastfetch
     ];
   };
   boot.supportedFilesystems = [ "zfs" ];
@@ -50,17 +50,16 @@
     efi.canTouchEfiVariables = true;
   };
 
-  sound.enable = true;
   nix.settings.trusted-users = ["root" "@wheel"];
   programs.zsh.enable = true;
+  security.sudo.wheelNeedsPassword = false;
   users = {
     mutableUsers = false;
-    users.root.initialPassword = "hunter2";
     users.dcard = {
       isNormalUser = true;
       createHome = true;
       shell = pkgs.zsh;
-      extraGroups = ["wheel" "video" "libvirtd"]; #TODO: double check
+      extraGroups = ["wheel"];
     };
   };
 }
