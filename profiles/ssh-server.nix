@@ -2,7 +2,6 @@
   authorizedKeys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMCrf5FKQmZRA9ip4s/fOt1PVg+90k6tvEoDkCnPq1qL @oppenheimer"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMOK0uyFwBEoBHuqXsrWZOAMROsDYGjzwEUmrAhz5jfr @schrodinger"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDHQiRYpOfTpddexkndt7d3Bw2wS/wLKKjs4526pJOdM @doppler"
   ];
 in {
   services.openssh = {
