@@ -8,6 +8,7 @@
     color = "neutral";
     target = "_self";
     fullWidth = true;
+    language = "en";
     headerStyle = "boxedWidgets";
     statusStyle = "dot";
     iconStyle = "theme";
@@ -19,6 +20,10 @@
       Infrastructure = {
         style = "row";
         columns = 4;
+      };
+      Observability = {
+        style = "row";
+        columns = 3;
       };
       Home = {
         style = "row";
@@ -58,12 +63,32 @@
             siteMonitor = "https://status.dcard.pt/status/maxwell";
           };
         }
+      ];
+    }
+    {
+      Observability = [
         {
           Grafana = {
             href = "https://grafana.dcard.pt";
             description = "Metrics dashboards";
             icon = "grafana";
             siteMonitor = "https://grafana.dcard.pt";
+          };
+        }
+        {
+          "Service Status" = {
+            href = "https://status.dcard.pt/status/maxwell";
+            description = "Public service health";
+            icon = "uptime-kuma";
+            siteMonitor = "https://status.dcard.pt/status/maxwell";
+          };
+        }
+        {
+          Portainer = {
+            href = "https://portainer.dcard.pt";
+            description = "Container inventory";
+            icon = "docker";
+            siteMonitor = "https://portainer.dcard.pt";
           };
         }
       ];
@@ -142,43 +167,148 @@
     }
   ];
 
-  bookmarks = yaml.generate "homepage-bookmarks.yaml" [];
+  bookmarks = yaml.generate "homepage-bookmarks.yaml" [
+    {
+      Dashboards = [
+        {
+          Overview = [
+            {
+              abbr = "GO";
+              href = "https://grafana.dcard.pt/d/maxwell-overview/maxwell-overview";
+            }
+          ];
+        }
+        {
+          Logs = [
+            {
+              abbr = "GL";
+              href = "https://grafana.dcard.pt/d/maxwell-logs/maxwell-logs";
+            }
+          ];
+        }
+        {
+          Storage = [
+            {
+              abbr = "GS";
+              href = "https://grafana.dcard.pt/d/maxwell-storage/maxwell-storage";
+            }
+          ];
+        }
+      ];
+    }
+  ];
 
   customCss = pkgs.writeText "homepage-custom.css" ''
+    :root {
+      --maxwell-bg: #0e1116;
+      --maxwell-panel: rgba(28, 33, 40, 0.78);
+      --maxwell-panel-strong: rgba(35, 41, 50, 0.94);
+      --maxwell-border: rgba(255, 255, 255, 0.1);
+      --maxwell-border-strong: rgba(255, 255, 255, 0.18);
+      --maxwell-muted: rgba(255, 255, 255, 0.58);
+      --maxwell-text: rgba(255, 255, 255, 0.9);
+      --maxwell-accent: #5ca877;
+      --maxwell-accent-2: #7b5cff;
+    }
+
+    html {
+      background: var(--maxwell-bg);
+    }
+
     body {
       background:
-        linear-gradient(135deg, rgba(22, 24, 29, 0.96), rgba(13, 15, 19, 0.98)),
-        #111318;
+        radial-gradient(circle at 18% 0%, rgba(92, 168, 119, 0.2), transparent 26rem),
+        radial-gradient(circle at 88% 8%, rgba(123, 92, 255, 0.16), transparent 28rem),
+        linear-gradient(135deg, rgba(17, 20, 26, 0.98), rgba(10, 12, 16, 0.98)),
+        var(--maxwell-bg);
+      color: var(--maxwell-text);
     }
 
     #page_container {
       max-width: 1500px;
+      padding-top: 1.25rem;
+    }
+
+    header,
+    #information-widgets {
+      position: relative;
+      z-index: 1;
+    }
+
+    header::after {
+      content: "LAN services, automation, telemetry";
+      display: block;
+      margin-top: 0.35rem;
+      color: var(--maxwell-muted);
+      font-size: 0.95rem;
+      letter-spacing: 0;
     }
 
     #information-widgets > div,
     .service-card {
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+      border: 1px solid var(--maxwell-border);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.26);
+      backdrop-filter: blur(14px);
     }
 
     .service-card {
-      background: rgba(28, 31, 38, 0.72);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
+        var(--maxwell-panel);
+      transition:
+        background 150ms ease,
+        border-color 150ms ease,
+        transform 150ms ease,
+        box-shadow 150ms ease;
     }
 
     .service-card:hover {
-      background: rgba(37, 41, 50, 0.9);
-      border-color: rgba(255, 255, 255, 0.16);
-      transform: translateY(-1px);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent),
+        var(--maxwell-panel-strong);
+      border-color: var(--maxwell-border-strong);
+      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.34);
+      transform: translateY(-2px);
+    }
+
+    .service-card:first-child {
+      border-color: rgba(92, 168, 119, 0.24);
     }
 
     .service-card .description,
     .service-card p {
-      color: rgba(255, 255, 255, 0.58);
+      color: var(--maxwell-muted);
     }
 
     .services-group .text-theme-800,
     .services-group .dark\:text-theme-200 {
       letter-spacing: 0;
+    }
+
+    .services-group > div:first-child {
+      color: rgba(255, 255, 255, 0.86);
+      font-weight: 650;
+    }
+
+    .services-group > div:first-child::before {
+      content: "";
+      display: inline-block;
+      width: 0.55rem;
+      height: 0.55rem;
+      margin-right: 0.55rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--maxwell-accent), var(--maxwell-accent-2));
+      vertical-align: 0.05rem;
+    }
+
+    #information-widgets > div {
+      background: rgba(20, 24, 30, 0.76);
+    }
+
+    input,
+    .search-container input {
+      background: rgba(14, 17, 22, 0.72) !important;
+      border: 1px solid var(--maxwell-border) !important;
     }
   '';
 in {

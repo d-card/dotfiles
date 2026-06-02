@@ -350,7 +350,6 @@
   "refresh": "30s",
   "schemaVersion": 42,
   "tags": [
-    "maxwell",
     "services"
   ],
   "time": {

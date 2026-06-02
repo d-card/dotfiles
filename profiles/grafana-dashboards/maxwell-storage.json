@@ -302,7 +302,6 @@
   "refresh": "30s",
   "schemaVersion": 42,
   "tags": [
-    "maxwell",
     "storage"
   ],
   "time": {
