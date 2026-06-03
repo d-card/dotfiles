@@ -112,11 +112,11 @@
           };
         }
         {
-          Mealie = {
-            href = "https://mealie.dcard.pt";
-            description = "Recipes and meal planning";
-            icon = "mealie";
-            siteMonitor = "https://mealie.dcard.pt";
+          KitchenOwl = {
+            href = "https://kitchenowl.dcard.pt";
+            description = "Shopping lists and meal planning";
+            icon = "kitchenowl";
+            siteMonitor = "https://kitchenowl.dcard.pt";
           };
         }
       ];

@@ -152,7 +152,7 @@ in {
               "https://homepage.dcard.pt"
               "https://tools.dcard.pt"
               "https://pdf.dcard.pt"
-              "https://mealie.dcard.pt"
+              "https://kitchenowl.dcard.pt"
               "https://ntfy.dcard.pt"
               "https://paste.dcard.pt"
             ];
@@ -351,31 +351,31 @@ in {
 
     provision = {
       enable = true;
-        datasources.settings = {
-          deleteDatasources = [
-            {
-              name = "Loki";
-              orgId = 1;
-            }
-          ];
+      datasources.settings = {
+        deleteDatasources = [
+          {
+            name = "Loki";
+            orgId = 1;
+          }
+        ];
 
-          datasources = [
-            {
-              name = "Prometheus";
-              type = "prometheus";
-              access = "proxy";
-              url = "http://127.0.0.1:9090";
-              isDefault = true;
-            }
-            {
-              name = "Loki";
-              uid = "Loki";
-              type = "loki";
-              access = "proxy";
-              url = "http://127.0.0.1:3100";
-            }
-          ];
-        };
+        datasources = [
+          {
+            name = "Prometheus";
+            type = "prometheus";
+            access = "proxy";
+            url = "http://127.0.0.1:9090";
+            isDefault = true;
+          }
+          {
+            name = "Loki";
+            uid = "Loki";
+            type = "loki";
+            access = "proxy";
+            url = "http://127.0.0.1:3100";
+          }
+        ];
+      };
 
       dashboards.settings.providers = [
         {

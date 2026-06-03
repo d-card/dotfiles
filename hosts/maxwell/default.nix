@@ -12,8 +12,8 @@
     home-assistant
     profiles.apps.homepage
     profiles.apps."it-tools"
+    profiles.apps.kitchenowl
     profiles.apps."stirling-pdf"
-    profiles.apps.mealie
     profiles.apps.ntfy
     profiles.apps.privatebin
     monitoring
@@ -78,7 +78,7 @@
     credentialFiles.CLOUDFLARE_DNS_API_TOKEN_FILE =
       config.age.secrets.cloudflareToken.path;
   };
-  security.acme.certs."mealie.dcard.pt" = {
+  security.acme.certs."kitchenowl.dcard.pt" = {
     group = "nginx";
     dnsProvider = "cloudflare";
     credentialFiles.CLOUDFLARE_DNS_API_TOKEN_FILE =
@@ -158,9 +158,9 @@
       locations."/".proxyPass = "http://127.0.0.1:3005";
     };
 
-    "mealie.dcard.pt" = {
+    "kitchenowl.dcard.pt" = {
       forceSSL = true;
-      useACMEHost = "mealie.dcard.pt";
+      useACMEHost = "kitchenowl.dcard.pt";
       locations."/" = {
         proxyPass = "http://127.0.0.1:3006";
         proxyWebsockets = true;
@@ -225,7 +225,7 @@
       enabled = true;
     }
     {
-      domain = "mealie.dcard.pt";
+      domain = "kitchenowl.dcard.pt";
       answer = "192.168.1.237";
       enabled = true;
     }

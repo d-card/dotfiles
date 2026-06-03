@@ -6,4 +6,8 @@ in {
     schrodinger
     maxwell
   ];
+  "cloudflare/kitchenowl-tunnel.age".publicKeys = [
+    schrodinger
+    maxwell
+  ];
 }
