@@ -343,7 +343,11 @@ in {
         root_url = "https://grafana.dcard.pt/";
       };
 
-      analytics.reporting_enabled = false;
+      analytics = {
+        reporting_enabled = false;
+        check_for_updates = false;
+        check_for_plugin_updates = false;
+      };
 
       security.secret_key = "$__file{/var/lib/grafana/secret_key}";
       security.admin_password = "$__file{/var/lib/grafana/admin_password}";

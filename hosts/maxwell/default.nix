@@ -183,6 +183,18 @@
     };
   };
 
+  services.adguardhome.settings = {
+    querylog = {
+      ignored_enabled = true;
+      ignored = ["||dcard.pt^"];
+    };
+
+    statistics = {
+      ignored_enabled = true;
+      ignored = ["||dcard.pt^"];
+    };
+  };
+
   services.adguardhome.settings.filtering.rewrites = [
     {
       domain = "portainer.dcard.pt";
