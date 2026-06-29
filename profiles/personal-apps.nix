@@ -5,6 +5,7 @@
     docker-buildx
     docker-compose
     dust
+    omp
     exiftool
     ffmpeg
     gcc
