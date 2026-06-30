@@ -51,6 +51,11 @@
   };
 
 
+  location = {
+    latitude = 38.72;
+    longitude = -9.14;
+  };
+
   time.timeZone = "Europe/Lisbon";
   nix.settings.trusted-users = ["root" "@wheel"];
   programs.zsh.enable = true;
