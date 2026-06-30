@@ -50,6 +50,8 @@
     efi.canTouchEfiVariables = true;
   };
 
+
+  time.timeZone = "Europe/Lisbon";
   nix.settings.trusted-users = ["root" "@wheel"];
   programs.zsh.enable = true;
   security.sudo.wheelNeedsPassword = false;
