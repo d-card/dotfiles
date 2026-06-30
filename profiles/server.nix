@@ -1,6 +1,4 @@
 {pkgs, ...}: {
-  time.timeZone = "Europe/Lisbon";
-
   environment.systemPackages = with pkgs; [
     btop
     htop
