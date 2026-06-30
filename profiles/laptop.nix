@@ -9,7 +9,10 @@
   services = {
     blueman.enable = true;
     fwupd.enable = true;
-    libinput.enable = true;
+    libinput = {
+      enable = true;
+      touchpad.naturalScrolling = true;
+    };
     power-profiles-daemon.enable = true;
     printing.enable = true;
     thermald.enable = true;
@@ -22,16 +25,7 @@
 
   programs = {
     virt-manager.enable = true;
-    wireshark.enable = true;
   };
-
-  environment.systemPackages = with pkgs; [
-    android-tools
-    brightnessctl
-    networkmanagerapplet
-    pulsemixer
-    usbutils
-  ];
 
   users.users.dcard.extraGroups = [
     "adbusers"
@@ -39,6 +33,5 @@
     "libvirtd"
     "networkmanager"
     "video"
-    "wireshark"
   ];
 }

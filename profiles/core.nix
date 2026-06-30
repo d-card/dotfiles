@@ -43,7 +43,7 @@
       fastfetch
     ];
   };
-  boot.supportedFilesystems = [ "zfs" ];
+  boot.supportedFilesystems = [];
   boot.loader = {
     systemd-boot.enable = true;
     systemd-boot.editor = false;
@@ -54,9 +54,10 @@
   programs.zsh.enable = true;
   security.sudo.wheelNeedsPassword = false;
   users = {
-    mutableUsers = false;
+    mutableUsers = true;
     users.dcard = {
       isNormalUser = true;
+      initialPassword = "hunter2";
       createHome = true;
       shell = pkgs.zsh;
       extraGroups = ["wheel"];

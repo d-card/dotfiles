@@ -28,7 +28,6 @@
     python3Packages.numpy
     python3Packages.openpyxl
     python3Packages.pip
-    python3Packages.pipx
     python3Packages.pwntools
     python3Packages.pycryptodome
     python3Packages.pymongo
@@ -57,5 +56,9 @@
     xclip
     xdg-utils
     zip
+    android-tools
+    brightnessctl
+    usbutils
+    wireshark
   ];
 }

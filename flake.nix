@@ -37,45 +37,6 @@
   in {
     inherit nixosConfigurations overlays;
 
-    packages.x86_64-linux = {
-      maxwell-deploy = pkgs.writeShellScriptBin "maxwell-deploy" ''
-        set -euo pipefail
-
-        cd "''${1:-$HOME/git/dotfiles}"
-        git pull --ff-only
-        nixos-rebuild switch --flake .#maxwell --target-host maxwell --use-remote-sudo
-      '';
-
-      maxwell-installer =
-        (nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs profiles;};
-          modules = [
-            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-            profiles.ssh-server
-            {
-              networking.hostName = "maxwell-installer";
-
-              nix.settings.experimental-features = ["nix-command" "flakes"];
-              security.sudo.wheelNeedsPassword = false;
-              services.openssh.openFirewall = true;
-              users = {
-                groups.dcard = {};
-                users.dcard = {
-                  isNormalUser = true;
-                  group = "dcard";
-                  extraGroups = ["wheel"];
-                };
-              };
-            }
-          ];
-        })
-        .config
-        .system
-        .build
-        .isoImage;
-    };
-
     devShells.x86_64-linux.default = pkgs.mkShell {
       buildInputs = with pkgs; [
         agenix.packages.x86_64-linux.default

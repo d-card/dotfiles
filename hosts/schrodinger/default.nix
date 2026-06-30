@@ -7,13 +7,13 @@
     profiles.hardware.amd
     profiles.hardware.fingerprint
     profiles."desktop-plasma"
-    profiles."personal-apps"
+    profiles."user-packages"
+    profiles.secrets
     profiles.ssh-server
   ];
 
   networking = {
     hostId = "1124b2fb";
-    useDHCP = false;
   };
 
   boot = {

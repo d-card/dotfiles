@@ -2,7 +2,8 @@
   services = {
     xserver = {
       enable = true;
-      xkb.layout = "us-intl";
+      xkb.layout = "us";
+      xkb.variant = "intl";
     };
 
     displayManager.sddm.enable = true;

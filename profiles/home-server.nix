@@ -27,7 +27,7 @@
       config.age.secrets.cloudflareToken.path;
   };
 in {
-  imports = with profiles; [
+    imports = with profiles; [
     containers
     dns
     home-assistant
@@ -37,10 +37,12 @@ in {
     profiles.apps."stirling-pdf"
     profiles.apps.ntfy
     profiles.apps.privatebin
+    profiles.apps."uptime-kuma"
     monitoring
     maintenance
     acme-cloudflare
     reverse-proxy
+    samba
   ];
 
   security.acme.certs = lib.genAttrs domains (_: cloudflareCert);

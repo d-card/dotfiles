@@ -1,14 +1,4 @@
-{pkgs, ...}: let
-  maxwellDeploy = pkgs.writeShellScriptBin "maxwell-deploy" ''
-    set -euo pipefail
-
-    cd "''${1:-$HOME/git/dotfiles}"
-    git pull --ff-only
-    nixos-rebuild switch --flake .#maxwell --target-host maxwell --use-remote-sudo
-  '';
-in {
-  environment.systemPackages = [maxwellDeploy];
-
+{pkgs, ...}: {
   nix = {
     optimise = {
       automatic = true;
