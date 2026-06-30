@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Zentryx Hosting — Game Servers & VPS Portugal</title>
+<meta name="description" content="Servidores de jogos e VPS em Portugal. Minecraft, FiveM, CS2 e mais. Latência mínima, suporte português.">
+<style>
+nav{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--card)}
+nav h1{font-size:18px;font-weight:600}
+nav button{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px}
+nav button:hover{opacity:0.85}
+main{max-width:800px;margin:0 auto;padding:24px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:16px}
+.card h2{font-size:16px;margin-bottom:12px}
+.form{display:flex;flex-direction:column;gap:12px}
+.form input,.form select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:6px;font-size:14px}
+.form select{appearance:none}
+.form input:focus,.form select:focus{outline:none;border-color:var(--accent)}
+.btn{background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500}
+.btn:hover{opacity:0.85}
+.btn-sm{background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px}
+.btn-sm:hover{background:var(--border)}
+.row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.plan-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:16px;cursor:pointer;transition:border-color .15s}
+.plan-card:hover{border-color:var(--accent)}
+.plan-card.selected{border-color:var(--accent);background:#58a6ff10}
+.plan-card h3{font-size:15px;margin-bottom:4px}
+.plan-card .price{font-size:20px;font-weight:700;color:var(--accent)}
+.plan-card .specs{font-size:12px;color:var(--dim);margin-top:4px}
+.tag{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:500}
+.tag-vps{background:#58a6ff20;color:var(--accent)}
+.tag-gs{background:#3fb95020;color:var(--green)}
+.status{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.status-running{background:var(--green)}
+.status-stopped{background:var(--red)}
+.hidden{display:none}
+.tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--border)}
+.tab{padding:10px 20px;cursor:pointer;font-size:14px;color:var(--dim);border-bottom:2px solid transparent}
+.tab.active{color:var(--text);border-bottom-color:var(--accent)}
+.error{color:var(--red);font-size:13px;margin-top:4px}
+.empty{text-align:center;color:var(--dim);padding:40px 0}
+</style>
+</head>
+<body>
+<nav>
+  <h1>Zentryx</h1>
+  <div id="nav-right">
+    <button onclick="showLogin()" id="nav-login-btn">Entrar</button>
+    <span id="nav-user" class="hidden"></span>
+    <button onclick="logout()" class="btn-sm hidden" id="nav-logout-btn" style="margin-left:12px">Sair</button>
+  </div>
+</nav>
+<main>
+  <!-- Login -->
+  <div id="view-login" class="card">
+    <h2>Entrar</h2>
+    <div class="form">
+      <input type="email" id="login-email" placeholder="Email">
+      <input type="password" id="login-password" placeholder="Password">
+      <div class="row">
+        <button class="btn" onclick="login()">Entrar</button>
+        <a href="#" onclick="showRegister()" style="color:var(--accent);font-size:13px">Criar conta</a>
+      </div>
+      <div class="error hidden" id="login-error"></div>
+    </div>
+  </div>
+
+  <!-- Register -->
+  <div id="view-register" class="card hidden">
+    <h2>Criar Conta</h2>
+    <div class="form">
+      <input type="text" id="reg-name" placeholder="Nome">
+      <input type="email" id="reg-email" placeholder="Email">
+      <input type="password" id="reg-password" placeholder="Password">
+      <div class="row">
+        <button class="btn" onclick="register()">Criar Conta</button>
+        <a href="#" onclick="showLogin()" style="color:var(--accent);font-size:13px">Já tenho conta</a>
+      </div>
+      <div class="error hidden" id="reg-error"></div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="view-dashboard" class="hidden">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('servers')">Meus Servidores</div>
+      <div class="tab" onclick="switchTab('create')">Criar Servidor</div>
+    </div>
+
+    <!-- Tab: My Servers -->
+    <div id="tab-servers">
+      <div id="servers-list"></div>
+    </div>
+
+    <!-- Tab: Create -->
+    <div id="tab-create" class="hidden">
+      <div class="card">
+        <h2>Tipo de Servidor</h2>
+        <div class="row" style="gap:12px">
+          <button class="btn" id="type-vps" onclick="selectType('vps')">VPS (Máquina Virtual)</button>
+          <button class="btn" id="type-gs" onclick="selectType('gameserver')" style="background:var(--card);border:1px solid var(--accent);color:var(--accent)">Game Server</button>
+        </div>
+      </div>
+      <div id="create-options" class="hidden">
+        <div id="plan-list" class="plan-grid"></div>
+        <div class="card hidden" id="create-form-card">
+          <h2>Detalhes</h2>
+          <div class="form" style="margin-top:12px">
+            <select id="os-select" class="hidden">
+              <option value="images:ubuntu/24.04">Ubuntu 24.04</option>
+              <option value="images:debian/12">Debian 12</option>
+              <option value="images:alpine/edge">Alpine Edge</option>
+            </select>
+            <select id="game-select" class="hidden">
+              <option value="minecraft-paper">Minecraft Paper</option>
+              <option value="minecraft-vanilla">Minecraft Vanilla</option>
+              <option value="minecraft-forge">Minecraft Forge</option>
+            </select>
+            <button class="btn" onclick="createServer()" id="create-btn">Criar Servidor</button>
+            <div class="error hidden" id="create-error"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+let token = localStorage.getItem('token');
+let selectedType = null;
+let selectedPlan = null;
+
+const API = '';
+
+function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...opts.headers };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return fetch(API + path, { ...opts, headers }).then(r => r.json().then(d => ({ ok: r.ok, status: r.status, data: d })));
+}
+
+// ---- Auth ----
+function showLogin() {
+  document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
+  document.getElementById('view-login').classList.remove('hidden');
+}
+
+function showRegister() {
+  document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
+  document.getElementById('view-register').classList.remove('hidden');
+}
+
+function showDashboard() {
+  document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
+  document.getElementById('view-dashboard').classList.remove('hidden');
+  document.getElementById('nav-login-btn').classList.add('hidden');
+  document.getElementById('nav-logout-btn').classList.remove('hidden');
+  loadServers();
+}
+
+async function login() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const res = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+  if (res.ok) {
+    token = res.data.access_token;
+    localStorage.setItem('token', token);
+    document.getElementById('nav-user').textContent = email;
+    document.getElementById('nav-user').classList.remove('hidden');
+    showDashboard();
+  } else {
+    document.getElementById('login-error').textContent = res.data.detail || 'Login failed';
+    document.getElementById('login-error').classList.remove('hidden');
+  }
+}
+
+async function register() {
+  const email = document.getElementById('reg-email').value;
+  const password = document.getElementById('reg-password').value;
+  const name = document.getElementById('reg-name').value;
+  const res = await api('/auth/register', { method: 'POST', body: JSON.stringify({ email, password, full_name: name }) });
+  if (res.ok) {
+    token = res.data.access_token;
+    localStorage.setItem('token', token);
+    document.getElementById('nav-user').textContent = email;
+    document.getElementById('nav-user').classList.remove('hidden');
+    showDashboard();
+  } else {
+    document.getElementById('reg-error').textContent = res.data.detail || 'Register failed';
+    document.getElementById('reg-error').classList.remove('hidden');
+  }
+}
+
+function logout() {
+  token = null;
+  localStorage.removeItem('token');
+  document.getElementById('nav-user').classList.add('hidden');
+  document.getElementById('nav-logout-btn').classList.add('hidden');
+  document.getElementById('nav-login-btn').classList.remove('hidden');
+  showLogin();
+}
+
+// ---- Dashboard ----
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.textContent.toLowerCase().includes(tab)));
+  document.getElementById('tab-servers').classList.toggle('hidden', tab !== 'servers');
+  document.getElementById('tab-create').classList.toggle('hidden', tab !== 'create');
+  if (tab === 'servers') loadServers();
+}
+
+async function loadServers() {
+  const res = await api('/instances');
+  const list = document.getElementById('servers-list');
+  if (!res.ok || !res.data.length) {
+    list.innerHTML = '<div class="empty">Nenhum servidor ainda. Vai ao tab "Criar Servidor".</div>';
+    return;
+  }
+  list.innerHTML = res.data.map(s => `
+    <div class="card">
+      <div class="row">
+        <div>
+          <span class="status ${s.status === 'running' ? 'status-running' : 'status-stopped'}"></span>
+          <strong>${s.plan_name}</strong>
+          <span class="tag ${s.product_type === 'vps' ? 'tag-vps' : 'tag-gs'}">${s.product_type === 'vps' ? 'VPS' : 'Game'}</span>
+        </div>
+        <span style="font-size:12px;color:var(--dim)">${new Date(s.created_at).toLocaleDateString('pt')}</span>
+      </div>
+      ${s.ipv4 ? `<div style="font-size:13px;color:var(--dim);margin-top:4px">Endereço: ${s.ipv4}${s.primary_port ? ':' + s.primary_port : ''}</div>` : ''}
+      ${s.product_type === 'gameserver' ? `
+        <div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
+          <div style="font-size:13px;font-weight:500;margin-bottom:8px">Gerir servidor</div>
+          <div style="font-size:13px;color:var(--dim)">Acede ao painel de controlo:</div>
+          <a href="https://panel.zentryx.pt" target="_blank" style="color:var(--accent);font-size:14px;font-weight:500;display:block;margin-top:4px">panel.zentryx.pt →</a>
+          <div style="font-size:12px;color:var(--dim);margin-top:8px">Usa o teu email de registo. Password: <code style="background:var(--card);padding:2px 6px;border-radius:3px">${s.panel_password || 'ver email'}</code></div>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+// ---- Create ----
+function selectType(type) {
+  selectedType = type;
+  selectedPlan = null;
+  document.getElementById('type-vps').style.background = type === 'vps' ? 'var(--accent)' : '';
+  document.getElementById('type-vps').style.color = type === 'vps' ? '#fff' : '';
+  document.getElementById('type-gs').style.background = type === 'gameserver' ? 'var(--accent)' : '';
+  document.getElementById('type-gs').style.color = type === 'gameserver' ? '#fff' : '';
+  document.getElementById('create-options').classList.remove('hidden');
+  document.getElementById('create-form-card').classList.add('hidden');
+  document.getElementById('os-select').classList.toggle('hidden', type !== 'vps');
+  document.getElementById('game-select').classList.toggle('hidden', type !== 'gameserver');
+  loadPlans();
+}
+
+async function loadPlans() {
+  const res = await api('/plans');
+  const plans = selectedType === 'vps' ? res.data.vps : res.data.gameserver;
+  const grid = document.getElementById('plan-list');
+  grid.innerHTML = plans.map(p => `
+    <div class="plan-card ${selectedPlan === p.id ? 'selected' : ''}" onclick="selectPlan('${p.id}')">
+      <h3>${p.name}</h3>
+      <div class="price">€${(p.price_cents / 100).toFixed(2)}<span style="font-size:12px;color:var(--dim)">/mês</span></div>
+      <div class="specs">${p.cpu_cores} CPU · ${p.ram_mb >= 1024 ? (p.ram_mb/1024).toFixed(1)+'GB' : p.ram_mb+'MB'} RAM · ${p.disk_gb}GB</div>
+    </div>
+  `).join('');
+}
+
+function selectPlan(id) {
+  selectedPlan = id;
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.toggle('selected', c.querySelector('h3').textContent.includes(id) || false));
+  loadPlans(); // re-render to update selection
+  document.getElementById('create-form-card').classList.remove('hidden');
+}
+
+async function createServer() {
+  if (!selectedPlan) return;
+  const body = { plan_id: selectedPlan };
+  if (selectedType === 'vps') {
+    body.os_template = document.getElementById('os-select').value;
+  } else {
+    body.game_type = document.getElementById('game-select').value;
+  }
+  const el = document.getElementById('create-error');
+  const btn = document.getElementById('create-btn');
+  btn.disabled = true;
+  btn.textContent = 'A criar...';
+  const res = await api(`/instances/${selectedType === 'vps' ? 'vps' : 'gameserver'}`, { method: 'POST', body: JSON.stringify(body) });
+  btn.disabled = false;
+  btn.textContent = 'Criar Servidor';
+  if (res.ok) {
+    el.classList.add('hidden');
+    switchTab('servers');
+  } else {
+    el.textContent = res.data.detail || 'Erro ao criar';
+    el.classList.remove('hidden');
+  }
+}
+
+// ---- Init ----
+if (token) {
+  api('/auth/me').then(r => {
+    if (r.ok) {
+      document.getElementById('nav-user').textContent = r.data.email;
+      document.getElementById('nav-user').classList.remove('hidden');
+      showDashboard();
+    } else {
+      token = null;
+      localStorage.removeItem('token');
+      showLogin();
+    }
+  });
+} else {
+  showLogin();
+}
+</script>
+</body>
+</html>

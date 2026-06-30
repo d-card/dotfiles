@@ -1,0 +1,17 @@
+/* Zentryx — Force dark purple theme */
+body{background:#0a0a0f!important;color:#f4f4f5!important}
+.main-header,.main-header .logo,.main-header .navbar{background:#13131a!important;border-bottom:1px solid #27272a!important}
+.main-header .logo{background:#7c3aed!important;color:#fff!important}
+.main-header .navbar .nav>li>a,.sidebar-toggle{color:#a78bfa!important}
+.main-header .navbar .nav>li>a:hover{background:rgba(124,58,237,.15)!important;color:#c4b5fd!important}
+.main-sidebar,.sidebar{background:#13131a!important}
+.sidebar-menu>li>a{color:#a1a1aa!important}
+.sidebar-menu>li.active>a,.sidebar-menu>li>a:hover{background:rgba(124,58,237,.12)!important;color:#c4b5fd!important;border-left:3px solid #7c3aed!important}
+.content-wrapper{background:#0a0a0f!important}
+.box,.info-box{background:#13131a!important;border:1px solid #27272a!important;border-radius:8px!important}
+.btn-primary{background:#7c3aed!important;border-color:#7c3aed!important}
+.btn-primary:hover{background:#6d28d9!important}
+a{color:#a78bfa!important}a:hover{color:#c4b5fd!important}
+input,select,textarea,.form-control{background:#1a1a24!important;border:1px solid #27272a!important;color:#f4f4f5!important;border-radius:6px!important}
+input:focus,.form-control:focus{border-color:#7c3aed!important;box-shadow:0 0 0 2px rgba(124,58,237,.2)!important}
+.label-success{background:#22c55e!important}.label-danger{background:#ef4444!important}
