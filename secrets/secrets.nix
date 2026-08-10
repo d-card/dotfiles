@@ -6,14 +6,6 @@ in {
     schrodinger
     maxwell
   ];
-  "cloudflare/kitchenowl-tunnel.age".publicKeys = [
-    schrodinger
-    maxwell
-  ];
-  "cloudflare/zentryx-tunnel.age".publicKeys = [
-    schrodinger
-    maxwell
-  ];
   "schrodinger-password.age".publicKeys = [
     schrodinger
     maxwell

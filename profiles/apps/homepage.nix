@@ -56,6 +56,14 @@
           };
         }
         {
+          Valetudo = {
+            href = "https://valetudo.dcard.pt";
+            description = "Robot vacuum";
+            icon = "/icons/valetudo.png";
+            siteMonitor = "https://valetudo.dcard.pt";
+          };
+        }
+        {
           Status = {
             href = "https://status.dcard.pt";
             description = "Uptime checks";

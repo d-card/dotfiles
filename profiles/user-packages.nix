@@ -4,22 +4,17 @@
     bind
     docker-buildx
     docker-compose
-    dust
     omp
-    exiftool
     ffmpeg
     gcc
     gdb
     go
     htop
     jq
-    mariadb
     mediainfo
     netcat
     nmap
-    nodejs
     openvpn
-    picocom
     python3
     python3Packages.beautifulsoup4
     python3Packages.flask
@@ -28,14 +23,11 @@
     python3Packages.numpy
     python3Packages.openpyxl
     python3Packages.pip
-    python3Packages.pwntools
-    python3Packages.pycryptodome
     python3Packages.pymongo
     python3Packages.regex
     python3Packages.scikit-learn
     python3Packages.seaborn
     python3Packages.sympy
-    python3Packages.z3-solver
     ripgrep-all
     rustup
     scc
@@ -55,9 +47,9 @@
     wireguard-tools
     xclip
     xdg-utils
+    mpv
     zip
     android-tools
-    brightnessctl
     usbutils
     wireshark
   ];

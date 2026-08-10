@@ -8,6 +8,10 @@
     profiles.server
     profiles."home-server"
     profiles.ssh-server
+    profiles.mosquitto
+    profiles.tailscale
+    profiles.altserver
+    profiles."altserver-daemon"
     inputs.disko.nixosModules.disko
     ./disk-config.nix
   ];

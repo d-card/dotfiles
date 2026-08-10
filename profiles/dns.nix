@@ -39,7 +39,9 @@
         }
       ];
 
-      user_rules = [];
+      user_rules = [
+        "||valetudo.dcard.pt^$dnsrewrite=192.168.1.135"
+      ];
 
       dns = {
         bind_hosts = ["0.0.0.0"];

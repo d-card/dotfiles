@@ -4,11 +4,7 @@
   secrets,
   ...
 }: let
-  cloudflaredKitchenowl = pkgs.writeShellScript "cloudflared-kitchenowl" ''
-    exec ${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --token-file "$CREDENTIALS_DIRECTORY/token"
-  '';
 in {
-  age.secrets.cloudflareKitchenowlTunnelToken.file = secrets."cloudflare/kitchenowl-tunnel.age".file;
 
   system.activationScripts.kitchenowlSecrets.text = ''
     install -d -m 0750 /var/lib/kitchenowl
@@ -33,20 +29,4 @@ in {
     };
   };
 
-  systemd.services.cloudflared-kitchenowl = {
-    description = "Cloudflare Tunnel for KitchenOwl";
-    after = [
-      "network-online.target"
-      "docker-kitchenowl.service"
-    ];
-    wants = ["network-online.target"];
-    wantedBy = ["multi-user.target"];
-    serviceConfig = {
-      DynamicUser = true;
-      LoadCredential = "token:${config.age.secrets.cloudflareKitchenowlTunnelToken.path}";
-      ExecStart = "${cloudflaredKitchenowl}";
-      Restart = "on-failure";
-      RestartSec = "10s";
-    };
-  };
 }

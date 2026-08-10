@@ -5,7 +5,6 @@
     bluetooth.enable = true;
     enableRedistributableFirmware = true;
   };
-
   services = {
     blueman.enable = true;
     fwupd.enable = true;
@@ -34,4 +33,14 @@
     "networkmanager"
     "video"
   ];
+
+  # ── Wifi stability ──
+  boot.extraModprobeConfig = ''
+    options iwlmvm power_scheme=1
+  '';
+  networking.networkmanager.wifi.powersave = false;
+
+  services.udev.extraRules = ''
+    SUBSYSTEM=="usb", DRIVER=="usb", ATTR{power/wakeup}="enabled"
+  '';
 }

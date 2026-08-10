@@ -155,6 +155,7 @@ in {
               "https://kitchenowl.dcard.pt"
               "https://ntfy.dcard.pt"
               "https://paste.dcard.pt"
+              "https://valetudo.dcard.pt"
             ];
             labels.instance = "maxwell";
           }

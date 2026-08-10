@@ -42,9 +42,6 @@
     alacritty
     brave
     discord
-    flameshot
-    gimp
-    kitty
     libreoffice
     mattermost-desktop
     obs-studio

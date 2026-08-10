@@ -14,10 +14,11 @@
     "grafana.dcard.pt"
     "homepage.dcard.pt"
     "tools.dcard.pt"
-    "pdf.dcard.pt"
     "kitchenowl.dcard.pt"
+    "pdf.dcard.pt"
     "ntfy.dcard.pt"
     "paste.dcard.pt"
+    "valetudo.dcard.pt"
   ];
 
   cloudflareCert = {
@@ -130,6 +131,12 @@ in {
       forceSSL = true;
       useACMEHost = "paste.dcard.pt";
       locations."/".proxyPass = "http://127.0.0.1:3008";
+    };
+
+    "valetudo.dcard.pt" = {
+      forceSSL = true;
+      useACMEHost = "valetudo.dcard.pt";
+      locations."/".proxyPass = "http://192.168.1.135";
     };
   };
 
