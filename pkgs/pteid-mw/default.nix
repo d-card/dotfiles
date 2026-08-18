@@ -7,9 +7,33 @@
   openssl,
   openpace,
   libGL,
+  xercesc,
+  xml-security-c,
+  libzip,
+  cjson,
+  openjpeg,
+  libpng,
+  libjpeg,
+  curl,
+  poppler,
+  freetype,
+  fontconfig,
+  lcms2,
+  zlib,
   patchelf,
+  pkg-config,
   ...
-}: stdenv.mkDerivation (finalAttrs: {
+}: let
+  # eidguiV2 needs the poppler Qt5 bindings (-lpoppler-qt5)
+  popplerQt5 = poppler.override {
+    qt5Support = true;
+    qtbase = qt5.qtbase;
+    suffix = "qt5";
+  };
+
+  dev = p: p.dev or p;
+in
+stdenv.mkDerivation (finalAttrs: {
   pname = "pteid-mw";
   version = "3.15.0";
 
@@ -20,27 +44,38 @@
     hash = "sha256-RgdRt9QSjo5vy4ZLChmzwG36kirrdHCGiyPbZpp6hiw=";
   };
 
-  # The source tree contains the middleware plus the SDK/GUI. Only the
-  # components required for browser authentication are built here:
-  #   common        -> libpteidcommon
-  #   dialogsQT     -> libpteiddialogsQT (spawns the PIN dialog server)
-  #   dialogsQTsrv  -> pteiddialogsQTsrv (Qt5 PIN dialog)
-  #   cardlayer     -> libpteidcardlayer (talks to the card via PC/SC + openpace)
-  #   pkcs11        -> libpteidpkcs11 (the module browsers load)
-  # PDF signing (pteid-poppler/applayer), eidguiV2 and the SDK are skipped.
+  # Full build of the official middleware: the PKCS#11 module, the SDK libs
+  # (cardlayer/applayer/eidlib/CMD services) and the eidguiV2 desktop app
+  # (document signing, card reading, cert management). Only the Java wrapper
+  # (needs JDK+swig) is skipped.
   sourceRoot = "source/pteid-mw-pt/_src/eidmw";
 
   nativeBuildInputs = [
     qt5.qmake
     qt5.wrapQtAppsHook
+    pkg-config
     patchelf
   ];
 
   buildInputs = [
     qt5.qtbase
+    qt5.qtdeclarative
+    qt5.qtquickcontrols
+    qt5.qtquickcontrols2
+    qt5.qtgraphicaleffects
+    qt5.qttools
     pcsclite
     openssl
     openpace
+    openjpeg
+    libpng
+    libjpeg
+    curl
+    popplerQt5
+    freetype
+    fontconfig
+    lcms2
+    zlib
   ];
 
   patches = [
@@ -60,29 +95,39 @@
       -e 's|WDIRSEP L"usr" WDIRSEP L"local" WDIRSEP L"share" WDIRSEP L"certs_test" WDIRSEP|L"'"$out"'/share/certs_test/"|' \
       -e 's|WDIRSEP L"usr" WDIRSEP L"local" WDIRSEP L"share" WDIRSEP L"pteid-mw" WDIRSEP L"www"|L"'"$out"'/share/pteid-mw/www/"|' \
       common/ConfigCommon.cpp
+
+    # eidguiV2 hardcodes the distro poppler-qt5 include path
+    sed -i "s|/usr/include/poppler/qt5/|${dev popplerQt5}/include/poppler/qt5|" eidguiV2/eidguiV2.pro
   '';
 
   buildPhase = ''
     runHook preBuild
 
-    subs="common dialogs/dialogsQT dialogs/dialogsQTsrv cardlayer pkcs11"
-    for sub in $subs; do
+    # Build order matters (matches the CONFIG += ordered top-level project):
+    # bundled poppler -> core libs -> SDK -> GUI app
+    builds="pteid-poppler:pteid-poppler.pro common:common.pro dialogs/dialogsQT:dialogsQT.pro dialogs/dialogsQTsrv:dialogsQTsrv.pro cardlayer:cardlayer.pro pkcs11:pkcs11.pro applayer:applayer.pro CMD/services:cmdServices.pro eidlib:eidlib.pro scap:scap.pro eidguiV2:eidguiV2.pro"
+    includes="${dev pcsclite}/include ${dev pcsclite}/include/PCSC ${dev openpace}/include ${dev popplerQt5}/include ${dev xercesc}/include ${dev xml-security-c}/include ${dev libzip}/include ${dev cjson}/include ${dev openjpeg}/include ${dev libpng}/include ${dev libjpeg}/include ${dev curl}/include ${dev freetype}/include/freetype2 ${dev fontconfig}/include ${dev lcms2}/include ${dev zlib}/include"
+    for entry in $builds; do
+      sub=''${entry%%:*}
+      pro=''${entry#*:}
       (
         cd "$sub"
-        qmake "$(basename "$sub").pro" \
+        qmake "$pro" \
           "PREFIX_DIR=$out" \
-          "INCLUDEPATH+=${pcsclite.dev}/include ${pcsclite.dev}/include/PCSC ${openpace}/include"
+          "INCLUDEPATH+=$includes" \
+          "QMAKE_LFLAGS+=-L${openssl.out or openssl}/lib -L${openpace}/lib -L${pcsclite.out or pcsclite}/lib -L${xercesc}/lib -L${xml-security-c}/lib -L${curl.out or curl}/lib -L${libpng}/lib -L${zlib}/lib -L${libzip.out or libzip}/lib -L${cjson}/lib -L${openjpeg}/lib -L${popplerQt5.out or popplerQt5}/lib -L${libjpeg.out or libjpeg}/lib -L${libGL.out or libGL}/lib"
         make -j"$NIX_BUILD_CORES"
       )
     done
-
     runHook postBuild
   '';
 
   installPhase = ''
     runHook preInstall
 
-    for sub in common dialogs/dialogsQT dialogs/dialogsQTsrv cardlayer pkcs11; do
+    builds="pteid-poppler:pteid-poppler.pro common:common.pro dialogs/dialogsQT:dialogsQT.pro dialogs/dialogsQTsrv:dialogsQTsrv.pro cardlayer:cardlayer.pro pkcs11:pkcs11.pro applayer:applayer.pro CMD/services:cmdServices.pro eidlib:eidlib.pro scap:scap.pro eidguiV2:eidguiV2.pro"
+    for entry in $builds; do
+      sub=''${entry%%:*}
       ( cd "$sub" && make install )
     done
 
@@ -91,10 +136,38 @@
     cp misc/certs/*.der "$out/share/certs/" 2>/dev/null || true
     cp misc/certs/*.pem "$out/share/certs/" 2>/dev/null || true
 
-    # Browsers dlopen libpteidpkcs11.so and the dialog server links Qt:
-    # give every artifact an explicit rpath so all shared deps (pteid libs,
-    # Qt, OpenSSL, openpace, PC/SC, libGL, libstdc++) resolve from the store.
-    rpath="$out/lib:${lib.makeLibraryPath [ qt5.qtbase.out openssl openpace pcsclite libGL stdenv.cc.cc.lib ]}"
+    # Desktop entry + icon for eidguiV2
+    install -Dm644 debian/pteid-mw-gui.desktop "$out/share/applications/pteid-mw-gui.desktop"
+    install -Dm644 debian/pteid-scalable.svg "$out/share/icons/hicolor/scalable/apps/pteid-scalable.svg"
+
+    # Browsers dlopen libpteidpkcs11.so and eidguiV2/dlgs link Qt + the SDK
+    # libs: give every artifact an explicit rpath so all shared deps resolve.
+    rpath="$out/lib:${lib.makeLibraryPath [
+      qt5.qtbase.out
+      qt5.qtdeclarative.out
+      qt5.qtquickcontrols.out
+      qt5.qtquickcontrols2.out
+      qt5.qtgraphicaleffects.out
+      qt5.qttools.out
+      openssl
+      openpace
+      pcsclite
+      libGL
+      xercesc
+      xml-security-c
+      libzip
+      cjson
+      openjpeg
+      libpng
+      libjpeg
+      curl
+      popplerQt5
+      freetype
+      fontconfig
+      lcms2
+      zlib
+      stdenv.cc.cc.lib
+    ]}"
     find "$out/lib" -type f -name '*.so*' -exec patchelf --set-rpath "$rpath" {} \;
     find "$out/bin" -type f -exec patchelf --set-rpath "$rpath" {} \;
 
@@ -102,7 +175,7 @@
   '';
 
   meta = {
-    description = "Portuguese eID middleware (Cartão de Cidadão / Chave Móvel Digital) — PKCS#11 browser authentication module";
+    description = "Autenticação.gov — Portuguese eID middleware: Cartão de Cidadão / Chave Móvel Digital signing app, SDK and PKCS#11 module";
     homepage = "https://github.com/amagovpt/autenticacao.gov";
     license = lib.licenses.eupl12;
     platforms = lib.platforms.linux;

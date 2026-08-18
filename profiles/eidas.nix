@@ -5,7 +5,5 @@
 
   environment.systemPackages = with pkgs; [
     pteid-mw
-    pcsc-tools
-    opensc # pkcs11-tool: module/reader diagnostics
   ];
 }
