@@ -1,0 +1,66 @@
+diff --git a/common/ByteArray.cpp b/common/ByteArray.cpp
+--- a/common/ByteArray.cpp
++++ b/common/ByteArray.cpp
+@@ -25,6 +25,7 @@
+ #include <exception>
+ #include <cassert>
+ #include <limits.h>
++#include <cstdint>
+ 
+ using namespace std;
+ 
+diff --git a/common/Config.cpp b/common/Config.cpp
+--- a/common/Config.cpp
++++ b/common/Config.cpp
+@@ -25,6 +25,7 @@
+ #include <stdlib.h>
+ #include <limits.h>
+ #include <sys/stat.h>
++#include <cstdint>
+ 
+ #include "Config.h"
+ #include "Util.h"
+diff --git a/common/Log.cpp b/common/Log.cpp
+--- a/common/Log.cpp
++++ b/common/Log.cpp
+@@ -28,6 +28,7 @@
+ #include "MWException.h"
+ #include "Util.h"
+ #include <string>
++#include <cstdint>
+ 
+ #define DO_LOGGING
+ 
+diff --git a/common/LogBase.cpp b/common/LogBase.cpp
+--- a/common/LogBase.cpp
++++ b/common/LogBase.cpp
+@@ -31,6 +31,7 @@
+ #include "Thread.h"
+ #include "Config.h"
+ #include "Util.h"
++#include <cstdint>
+ 
+ #ifdef WIN32
+ #include <windows.h>
+diff --git a/common/MWException.cpp b/common/MWException.cpp
+--- a/common/MWException.cpp
++++ b/common/MWException.cpp
+@@ -21,6 +21,7 @@
+ **************************************************************************** */
+ #include "MWException.h"
+ #include "Util.h"
++#include <cstdint>
+ 
+ using namespace std;
+ 
+diff --git a/common/datafile.cpp b/common/datafile.cpp
+--- a/common/datafile.cpp
++++ b/common/datafile.cpp
+@@ -69,6 +69,7 @@
+ #include <sstream>
+ #include <errno.h>
+ #include <limits.h>
++#include <cstdint>
+ 
+ #ifdef WIN32
+ #include <windows.h>

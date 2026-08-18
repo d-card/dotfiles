@@ -8,6 +8,7 @@
     profiles.hardware.fingerprint
     profiles."desktop-plasma"
     profiles."user-packages"
+    profiles.eidas
     profiles.secrets
     profiles.ssh-server
   ];
