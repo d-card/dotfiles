@@ -159,11 +159,11 @@ CRED
     mkdir -p "$out/share/certs" "$out/share/pteid-mw/www"
     cp misc/certs/*.der "$out/share/certs/" 2>/dev/null || true
     cp misc/certs/*.pem "$out/share/certs/" 2>/dev/null || true
-    cp misc/web/*.html "$out/share/pteid-mw/www/" 2>/dev/null || true
 
-    # Desktop entry + icon for eidguiV2
-    install -Dm644 debian/pteid-mw-gui.desktop "$out/share/applications/pteid-mw-gui.desktop"
-    install -Dm644 debian/pteid-scalable.svg "$out/share/icons/hicolor/scalable/apps/pteid-scalable.svg"
+    # NOTE: no desktop entry — the official AMA Flatpak app (pt.gov.autenticacao)
+    # is the supported GUI; the native eidguiV2 has a fortify-triggered crash
+    # in pteiddialogsQTsrv (sprintf overflow) that makes signing impossible.
+    cp misc/web/*.html "$out/share/pteid-mw/www/" 2>/dev/null || true
 
     # Browsers dlopen libpteidpkcs11.so and eidguiV2/dlgs link Qt + the SDK
     # libs: give every artifact an explicit rpath so all shared deps resolve.
