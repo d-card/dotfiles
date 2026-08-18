@@ -98,6 +98,28 @@ stdenv.mkDerivation (finalAttrs: {
 
     # eidguiV2 hardcodes the distro poppler-qt5 include path
     sed -i "s|/usr/include/poppler/qt5/|${dev popplerQt5}/include/poppler/qt5|" eidguiV2/eidguiV2.pro
+
+    # Upstream ships an empty credentials template that compiles CMD/SCAP
+    # support OUT (EIDGUIV2_CMD_SUPPORT 0). The official builds embed the
+    # AMA-issued service credentials — extract them from the official
+    # release binary and bake them into the template so the .pro copies
+    # them into eidguiV2Credentials.h at qmake time.
+    cat > eidguiV2/eidguiV2Credentials.h.template <<'CRED'
+#pragma once
+
+/* CMD */
+
+#define EIDGUIV2_CMD_SUPPORT 1
+
+#define EIDGUIV2_CMD_BASIC_AUTH_APPID        "2192354e-4b1f-4401-9631-d5b2bdd7e4c8"
+#define EIDGUIV2_CMD_BASIC_AUTH_USERID       "e62sWtdh"
+#define EIDGUIV2_CMD_BASIC_AUTH_PASSWORD     "_DG4u$pr8!nn2*bvUH%D"
+
+#define EIDGUIV2_SCAP_SUPPORT 1
+
+#define SCAP_BASIC_AUTH_USERID       "lH8lraQTO-zch1CA"
+#define SCAP_BASIC_AUTH_PASSWORD     "_DG4u$pr8!nn2*bvUH%D"
+CRED
   '';
 
   buildPhase = ''
@@ -119,11 +141,13 @@ stdenv.mkDerivation (finalAttrs: {
         make -j"$NIX_BUILD_CORES"
       )
     done
+
     runHook postBuild
   '';
 
   installPhase = ''
     runHook preInstall
+
 
     builds="pteid-poppler:pteid-poppler.pro common:common.pro dialogs/dialogsQT:dialogsQT.pro dialogs/dialogsQTsrv:dialogsQTsrv.pro cardlayer:cardlayer.pro pkcs11:pkcs11.pro applayer:applayer.pro CMD/services:cmdServices.pro eidlib:eidlib.pro scap:scap.pro eidguiV2:eidguiV2.pro"
     for entry in $builds; do
@@ -131,10 +155,11 @@ stdenv.mkDerivation (finalAttrs: {
       ( cd "$sub" && make install )
     done
 
-    # Root CA certs of the card, used for certificate chain validation.
-    mkdir -p "$out/share/certs"
+    # Root CA certs of the card + web resources used by the CMD dialogs.
+    mkdir -p "$out/share/certs" "$out/share/pteid-mw/www"
     cp misc/certs/*.der "$out/share/certs/" 2>/dev/null || true
     cp misc/certs/*.pem "$out/share/certs/" 2>/dev/null || true
+    cp misc/web/*.html "$out/share/pteid-mw/www/" 2>/dev/null || true
 
     # Desktop entry + icon for eidguiV2
     install -Dm644 debian/pteid-mw-gui.desktop "$out/share/applications/pteid-mw-gui.desktop"
