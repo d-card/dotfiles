@@ -24,7 +24,14 @@
       "usb_storage"
       "sd_mod"
     ];
+    # Hibernate resume target = disko swap partition.
+    resumeDevice = "/dev/disk/by-partlabel/disk-main-swap";
   };
+  # Critical battery action must be Hibernate: below ~5% the EC fires
+  # "battery almost empty" wakeups out of S3, so suspend at critical battery
+  # loops forever and drains the battery (observed 2026-08-31). Hibernate
+  # powers off completely - a powered-off machine cannot be woken.
+  services.upower.criticalPowerAction = "Hibernate";
 
   system.stateVersion = "26.05";
 }
