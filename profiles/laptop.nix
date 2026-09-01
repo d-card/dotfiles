@@ -40,7 +40,4 @@
   '';
   networking.networkmanager.wifi.powersave = false;
 
-  services.udev.extraRules = ''
-    SUBSYSTEM=="usb", DRIVER=="usb", ATTR{power/wakeup}="enabled"
-  '';
 }
