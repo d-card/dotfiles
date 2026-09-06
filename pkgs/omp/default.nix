@@ -1,11 +1,11 @@
 { stdenv, fetchurl, patchelf, glibc, ... }:
 stdenv.mkDerivation {
   pname = "omp";
-  version = "16.2.8";
+  version = "18.1.11";
 
   src = fetchurl {
-    url = "https://github.com/can1357/oh-my-pi/releases/download/v16.2.8/omp-linux-x64";
-    hash = "sha256-GsM2bJMppwgo3QRr1w+yzT0ymBNz+zPfj4grA53kxCs=";
+    url = "https://github.com/can1357/oh-my-pi/releases/download/v18.1.11/omp-linux-x64";
+    hash = "sha256-Kyx4W7uv07Q/tgluSuY6A0LE2Aad4vh1qbduqZR8I4M=";
   };
 
   nativeBuildInputs = [ patchelf ];
